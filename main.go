@@ -1,33 +1,22 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"strings"
+	"os"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/renderer/html"
 )
 
 func main() {
-	md := goldmark.New(
-		goldmark.WithRendererOptions(
-			html.WithUnsafe(),
-		),
-	)
-	dat, err := ioutil.ReadFile("test.md")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	var buf bytes.Buffer
-	if err := md.Convert(dat, &buf); err != nil {
-		panic(err)
-	}
 
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(buf.String()))
+	f, err := os.Open("test.md")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	doc, err := goquery.NewDocumentFromReader(f)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,5 +25,4 @@ func main() {
 		content := s.Text()
 		fmt.Println(file, content)
 	})
-
 }
